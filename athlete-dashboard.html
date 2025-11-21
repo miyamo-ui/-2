@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GOATUSBOX – 受信箱（アスリート）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{background:#f5f6f8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+  </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-6">
+  <div class="w-full max-w-2xl relative">
+
+    <!-- 右上アカウント（ATHLETEデモ） -->
+    <header class="flex items-start justify-end mb-4">
+      <div class="relative">
+        <button id="avatarBtn"
+          class="flex items-center gap-2 rounded-full border border-slate-300 bg-white py-2 pl-2 pr-3 shadow-sm hover:bg-slate-50 transition text-left">
+          <div class="w-9 h-9 rounded-full bg-slate-800 text-white text-xs font-semibold grid place-items-center">AT</div>
+          <div class="hidden sm:flex flex-col leading-tight">
+            <span class="text-[11px] text-slate-500 font-medium">あなたのロール</span>
+            <span class="text-[11px] text-slate-800 font-semibold">ATHLETE</span>
+          </div>
+          <div class="text-[10px] text-slate-500 font-semibold">▼</div>
+        </button>
+        <div id="menu"
+          class="hidden absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white shadow-[0_16px_32px_rgba(0,0,0,0.08)] overflow-hidden text-sm">
+          <a href="gate.html" class="block px-4 py-3 hover:bg-slate-50">スポンサー画面へ</a>
+          <a href="login.html?returnTo=gate.html" class="block px-4 py-3 hover:bg-slate-50 border-t">ログアウト</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- メインカード（見出し） -->
+    <div class="w-full bg-white rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.07)] border border-gray-100 p-8 text-slate-800">
+      <div class="text-2xl font-bold text-slate-900 mb-2 text-center">📥 受信箱</div>
+      <p class="text-base text-slate-600 text-center mb-6">
+               <strong>スポンサーから届いた質問の一覧です</strong>
+
+      <!-- 質問リスト（カード群） -->
+      <div class="space-y-4">
+
+        <!-- 質問カード（質問者側と同系の白カード/角丸/薄影/境界線） -->
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs text-slate-500 mb-1">ナス・2025/11/07 10:12</div>
+          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
+            最近の練習で一番意識していることは？
+          </h3>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs text-slate-500 mb-1">ニンジン・2025/11/06 21:45</div>
+          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
+            試合前のルーティンを教えてください。
+          </h3>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs text-slate-500 mb-1">タマネギ・2025/11/05 19:08</div>
+          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
+            今季の個人目標は？
+          </h3>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs text-slate-500 mb-1">匿名18（Bronzeスポンサー）・2025/11/05 08:31</div>
+          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
+            コンディション維持で気をつけている食事はありますか？
+          </h3>
+        </article>
+
+      </div>
+
+      <!-- 注記 -->
+      <div class="text-sm text-slate-500 mt-6 text-center">
+        ※ 質問テキストのみを表示しています。画面をスクリーンショットして回答しましょう！
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 右上メニュー開閉
+    document.getElementById('avatarBtn').addEventListener('click',()=>{
+      document.getElementById('menu').classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>
