@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOATUSBOX 質問ページ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{background:#f5f6f8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+    /* 箱の質感ちょい足し */
+    .box-body{background:#0c1222;box-shadow:0 10px 30px rgba(0,0,0,.18), inset 0 -2px 0 rgba(255,255,255,.05)}
+    .box-lid{background:#131a30}
+  </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-6">
+
+  <div class="w-full max-w-2xl">
+    <!-- ヘッダー右上：簡易メニュー（任意） -->
+    <header class="flex justify-end mb-4">
+      <div class="text-[11px] text-slate-600">
+        <span id="tierText" class="font-semibold text-slate-800">BRONZE</span> 会員
+        ｜ 今月の残り <span id="remainHead" class="font-semibold">–</span>
+      </div>
+    </header>
+
+    <!-- カード -->
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.07)] p-8">
+      <!-- ロゴ＋箱 -->
+      <div class="relative mx-auto mb-6 w-28">
+        <!-- ロゴ（箱のフチに“くっつける”） -->
+        <img src="goatus-logo.png" alt="GOATUS" class="absolute -top-6 left-1/2 -translate-x-1/2 w-[66px] drop-shadow-lg pointer-events-none">
+        <!-- 箱のフタ -->
+        <div class="box-lid h-3 rounded-t-xl border border-slate-800/40"></div>
+        <!-- 箱本体 -->
+        <div class="box-body h-20 rounded-b-2xl border-x border-b border-slate-800/40"></div>
+      </div>
+
+      <h1 class="text-xl font-bold text-center mb-2">GOATUSBOX（質問）</h1>
+      <p class="text-sm text-slate-600 text-center mb-6">
+        あなたの質問はアスリートの投稿として公開されることがあります。
+      </p>
+
+      <!-- 残回数表示 -->
+      <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-6 text-sm">
+        <div class="flex items-center justify-between">
+          <div class="text-slate-700">今月の残り質問回数</div>
+          <div class="font-bold text-slate-900"><span id="remain">–</span></div>
+        </div>
+        <div id="quotaNote" class="mt-1 text-xs text-slate-500"></div>
+      </div>
+
+      <!-- フォーム -->
+      <form id="qForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-800 mb-1">質問内容 <span class="text-rose-600">*</span></label>
+          <textarea id="message" rows="6" required
+            class="w-full rounded-xl bg-slate-50 focus:bg-white px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-800 transition"
+            placeholder="例）最近のトレーニングで意識していることは？"></textarea>
+          <div class="mt-1 text-xs text-slate-500 text-right"><span id="count">0</span>/500</div>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700 select-none">
+            <input id="anon" type="checkbox" class="accent-slate-800">
+            匿名で送る
+          </label>
+          <input id="nickname" type="text" maxlength="24"
+            class="flex-1 rounded-xl bg-slate-50 focus:bg-white px-3 py-2 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-800 transition"
+            placeholder="ニックネーム（任意）"/>
+        </div>
+
+        <button id="submitBtn" type="submit"
+          class="w-full text-white text-base font-bold py-3 rounded-xl bg-[#0c1222] shadow-md hover:opacity-90 transition">
+          送信する
+        </button>
+
+        <p id="help" class="text-xs text-slate-500 text-center">
+          スパム・公序良俗に反する投稿は掲載できません。
+        </p>
+      </form>
+
+      <!-- 完了メッセージ -->
+      <div id="done" class="hidden mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        送信を受け付けました（デモ保存）。掲載まで少しお待ちください。<br/>
+        残り回数：<span id="remainAfter">–</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 共通Auth & 回数制限（デモ実装） ===== -->
+  <script>
+    // 既存フローと同じ簡易Auth（localStorage）
+    const Auth = {
+      get(){ const r = localStorage.getItem("goatusAuth"); return r?JSON.parse(r):null; },
+      isLoggedIn(){ return !!this.get(); }
+    };
+    function ensureAuth(returnTo){
+      if(!Auth.isLoggedIn()){
+        location.href = `login.html?returnTo=${encodeURIComponent(returnTo || location.pathname)}`;
+        return false;
+      }
+      return true;
+    }
+
+    // 月ごとのカウンタ保存キー
+    function ymKey(){ const d=new Date(); return `goatusQ_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`; }
+
+    // 現在の使用回数を取得
+    function getUsedCount(username){
+      const all = JSON.parse(localStorage.getItem(ymKey())||'{}');
+      return all[username] || 0;
+    }
+
+    // 1回消費を記録
+    function addOne(username){
+      const key = ymKey();
+      const all = JSON.parse(localStorage.getItem(key)||'{}');
+      all[username] = (all[username]||0) + 1;
+      localStorage.setItem(key, JSON.stringify(all));
+    }
+  </script>
+
+  <script>
+    // 入場時ログイン必須
+    if(!ensureAuth("question.html")) { /* redirect */ }
+
+    const user = Auth.get() || { username:"demo", tier:"BRONZE", remaining:1, max:2 }; // フォールバック
+    const tierToMax = { BRONZE:2, SILVER:4, GOLD:6, PLATINUM:8 };
+    const max = user.max ?? tierToMax[user.tier] ?? 2;
+
+    // UI参照
+    const remainEl = document.getElementById('remain');
+    const remainHead = document.getElementById('remainHead');
+    const quotaNote = document.getElementById('quotaNote');
+    const tierText  = document.getElementById('tierText');
+    const submitBtn = document.getElementById('submitBtn');
+    const form      = document.getElementById('qForm');
+    const message   = document.getElementById('message');
+    const countEl   = document.getElementById('count');
+    const doneBox   = document.getElementById('done');
+    const remainAfter = document.getElementById('remainAfter');
+
+    // 残回数計算
+    function refreshRemain(){
+      const used = getUsedCount(user.username || 'demo');
+      const remain = Math.max(0, max - used);
+      remainEl.textContent = `${remain} / ${max}`;
+      remainHead.textContent = `${remain} / ${max}`;
+      quotaNote.textContent = `プラン: ${user.tier}（月${max}回まで）`;
+      tierText.textContent = user.tier;
+
+      // 残ゼロなら送信不可
+      submitBtn.disabled = remain === 0;
+      submitBtn.classList.toggle('opacity-50', remain === 0);
+      submitBtn.classList.toggle('cursor-not-allowed', remain === 0);
+      if(remain === 0){
+        document.getElementById('help').textContent = '今月の上限に達しました。グレードアップで質問回数を増やせます。';
+      }
+      return remain;
+    }
+
+    refreshRemain();
+
+    // 文字数カウント＆上限
+    const MAX_LEN = 500;
+    message.addEventListener('input', ()=>{
+      if(message.value.length > MAX_LEN) message.value = message.value.slice(0, MAX_LEN);
+      countEl.textContent = message.value.length;
+    });
+
+    // 送信（デモ保存）
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(!message.value.trim()) return;
+
+      // 残回数チェック
+      const remain = refreshRemain();
+      if(remain <= 0) return;
+
+      // デモ保存：質問一覧をローカルに保存（運用時はAPIにPOST）
+      const listKey = `${ymKey()}_items`;
+      const list = JSON.parse(localStorage.getItem(listKey)||'[]');
+      list.push({
+        at: new Date().toISOString(),
+        user: user.username || 'demo',
+        tier: user.tier,
+        anon: document.getElementById('anon').checked,
+        nickname: document.getElementById('nickname').value || null,
+        msg: message.value.trim()
+      });
+      localStorage.setItem(listKey, JSON.stringify(list));
+
+      // カウント消費
+      addOne(user.username || 'demo');
+
+      // UI更新
+      message.value = '';
+      document.getElementById('nickname').value = '';
+      document.getElementById('anon').checked = false;
+      countEl.textContent = '0';
+      const remain2 = refreshRemain();
+      doneBox.classList.remove('hidden');
+      remainAfter.textContent = `${remain2} / ${max}`;
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>

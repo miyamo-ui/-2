@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOATUSBOX 質問送信前</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background:#f5f6f8; font-family: system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-6">
+
+  <div class="w-full max-w-2xl relative">
+
+    <!-- ヘッダー右上（アカウント / BRONZE想定） -->
+    <header class="flex items-start justify-end mb-4">
+      <div class="relative">
+        <button id="avatarButton"
+          class="flex items-center gap-2 rounded-full border border-slate-300 bg-white py-2 pl-2 pr-3 shadow-sm hover:bg-slate-50 transition text-left">
+          <div class="w-9 h-9 rounded-full bg-slate-800 text-white text-xs font-semibold grid place-items-center leading-none">BR</div>
+          <div class="hidden sm:flex flex-col leading-tight">
+            <span class="text-[11px] text-slate-500 font-medium">あなたのプラン</span>
+            <span class="text-[11px] text-slate-800 font-semibold" id="headerTierText">BRONZE会員</span>
+          </div>
+          <div class="text-[10px] text-slate-500 font-semibold">▼</div>
+        </button>
+
+        <div id="accountMenu"
+             class="hidden absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white shadow-[0_16px_32px_rgba(0,0,0,0.08)] text-slate-700 text-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-200 bg-slate-50">
+            <div class="text-[10px] text-slate-500 font-medium">現在のプラン</div>
+            <div class="text-[12px] text-slate-800 font-semibold flex items-center gap-2">
+              <span id="menuTierBadge" class="inline-block text-[10px] px-2 py-[2px] rounded-full bg-slate-800 text-white font-semibold">BRONZE</span>
+              <span id="menuQuotaText">月2回質問可</span>
+            </div>
+          </div>
+          <a href="#" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium">アカウント設定</a>
+          <a href="#" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium border-t border-slate-200">管理画面</a>
+          <a href="#" id="logoutBtn" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium border-t border-slate-200">ログアウト</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- メインカード -->
+    <div class="w-full bg-white rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.07)] border border-gray-100 p-8 text-slate-800">
+
+      <!-- タイトル / 説明 -->
+      <div class="text-2xl font-bold text-slate-900 mb-6 text-center flex flex-col items-center gap-2">
+        <div>🎉 スポンサー限定特典</div>
+        <div class="text-base font-normal text-slate-700 leading-relaxed text-center">
+          あなたはこの選手に直接質問できます。
+        </div>
+      </div>
+
+      <!-- ステータス（初期表示） -->
+      <div id="statusSection"
+           class="mt-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-slate-700 max-w-xl mx-auto">
+        <div class="flex items-start justify-between mb-2">
+          <div class="flex flex-col">
+            <span class="font-semibold text-slate-800 text-[13px] mb-1">
+              あなたのステータス
+            </span>
+            <span class="text-xs text-slate-600 leading-relaxed">
+              今月の残り質問回数:
+              <span id="quotaText" class="font-semibold text-slate-900 ml-1">2 / 2</span>
+            </span>
+          </div>
+          <span id="tierBadge" class="text-[10px] px-2 py-[4px] rounded-full bg-slate-800 text-white font-semibold h-fit">BRONZE</span>
+        </div>
+      </div>
+
+      <!-- フォーム遷移（初期表示） -->
+      <a id="openFormBtn"
+        href="question.html"
+        class="mt-6 block w-full max-w-xl mx-auto text-white text-xl font-bold py-5 text-center rounded-2xl bg-[#0c1222] shadow-lg hover:opacity-90 transition">
+        質問フォームを開く
+      </a>
+
+      <!-- 備考 -->
+      <div class="text-base text-slate-500 leading-relaxed mt-8 text-center">
+        あなたの質問はアスリートの投稿として公開されることがあります。
+      </div>
+
+      <!-- アップセル -->
+      <div class="border-t border-slate-200 pt-8 mt-10 text-left">
+        <div class="text-xs font-medium text-slate-500 mb-4 text-center sm:text-left">
+          もっと質問したい方・より深くサポートしたい方はこちら
+        </div>
+
+        <button id="showUpgradeBtn"
+          class="w-full text-center text-sm font-semibold py-3 px-4 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition">
+          グレードをアップして質問回数を増やす
+        </button>
+
+        <div id="upgradePanel"
+             class="hidden mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="text-[13px] text-slate-700 font-semibold mb-4 text-center">
+            あなたのサポートに応じて、質問できる回数が増えます
+          </div>
+          <div class="flex flex-wrap gap-3 justify-center text-[13px] font-semibold">
+            <div class="px-4 py-3 rounded-lg border border-amber-600 bg-amber-50 text-amber-700">BRONZE / 月2回</div>
+            <div class="px-4 py-3 rounded-lg border border-gray-400 bg-white text-gray-700">SILVER / 月4回</div>
+            <div class="px-4 py-3 rounded-lg border border-yellow-500 bg-yellow-50 text-yellow-700">GOLD / 月6回</div>
+            <div class="px-4 py-3 rounded-lg border border-indigo-600 bg-indigo-50 text-indigo-700">PLATINUM / 月8回</div>
+          </div>
+          <div class="text-[11px] text-slate-500 leading-relaxed mt-6 text-center">
+            グレードアップすると、より多く質問でき、<br/>あなたの声がアスリートの発信に反映されやすくなります。
+          </div>
+          <div class="text-center mt-6">
+            <a href="#" class="inline-block text-sm font-semibold py-3 px-4 rounded-lg border border-slate-800 bg-slate-800 text-white hover:bg-slate-700 transition">
+              アップグレードプランを見る
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 戻る -->
+      <div class="text-center mt-10">
+        <a href="gate.html" class="text-sm text-slate-500 underline hover:text-slate-700">← 戻る</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 認証ユーティリティ ===== -->
+  <script>
+    const Auth = {
+      get(){ const r = localStorage.getItem("goatusAuth"); return r ? JSON.parse(r) : null; },
+      isLoggedIn(){ return !!this.get(); }
+    };
+    function ensureAuth(returnTo){
+      if(!Auth.isLoggedIn()){
+        const url = 'login.html?returnTo=' + encodeURIComponent(returnTo || location.href);
+        location.href = url; return false;
+      }
+      return true;
+    }
+    // ?logout=1 でデモ認証クリア（テスト用）
+    if (new URLSearchParams(location.search).get('logout') === '1') {
+      localStorage.removeItem('goatusAuth');
+      location.href = location.pathname;
+    }
+  </script>
+
+  <!-- 振る舞い -->
+  <script>
+    // 入場時にログイン必須
+    ensureAuth("form-gate.html");
+
+    // ヘッダーメニュー
+    document.getElementById("avatarButton").addEventListener("click", ()=>{
+      document.getElementById("accountMenu").classList.toggle("hidden");
+    });
+
+    // ログアウト
+    document.getElementById('logoutBtn')?.addEventListener('click',(e)=>{
+      e.preventDefault();
+      localStorage.removeItem('goatusAuth');
+      location.href = 'login.html?returnTo=gate.html';
+    });
+
+    // アップセル開閉
+    document.getElementById("showUpgradeBtn").addEventListener("click", ()=>{
+      document.getElementById("upgradePanel").classList.toggle("hidden");
+    });
+
+    // 表示をユーザー情報に合わせて（デモ：無ければ BRONZE=2/2 に）
+    (function hydrateStatus(){
+      const user = Auth.get() || { tier:"BRONZE" };
+      const tierToMax = { BRONZE:2, SILVER:4, GOLD:6, PLATINUM:8 };
+      const max = user.max ?? tierToMax[user.tier] ?? 2;
+      const remaining = (user.remaining ?? max); // ← デモは満タン表示（2/2）
+
+      document.getElementById('quotaText').textContent = ` ${remaining} / ${max}`;
+      document.getElementById('tierBadge').textContent = user.tier;
+      document.getElementById('headerTierText').textContent = `${user.tier}会員`;
+      document.getElementById('menuTierBadge').textContent = user.tier;
+      document.getElementById('menuQuotaText').textContent = `月${max}回質問可`;
+    })();
+  </script>
+</body>
+</html>

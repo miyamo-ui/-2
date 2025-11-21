@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GOATUS – サインイン</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial}
+    /* 背景の上にうっすらビネットと暗幕 */
+    .bg-layer::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(0,0,0,.35), transparent 60%),
+        linear-gradient(180deg, rgba(7,12,28,.75), rgba(7,12,28,.85));
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+
+  <!-- 背景 -->
+  <div class="absolute inset-0 -z-10 bg-layer">
+    <img src="goatus-hero.jpg" alt="" class="w-full h-full object-cover object-center opacity-100 select-none pointer-events-none" />
+  </div>
+
+  <!-- ヘッダーバー（左上ロゴ帯） -->
+  <header class="absolute top-0 left-0 right-0">
+    <div class="mx-auto max-w-6xl px-5 py-4">
+      <div class="inline-flex items-center gap-3 rounded-xl bg-black/40 backdrop-blur px-4 py-2 ring-1 ring-white/15 shadow">
+        <img src="goatus-logo.png" alt="GOATUS" class="w-7 h-7 object-contain"/>
+        <span class="text-white font-extrabold tracking-wide text-sm">GOATUS</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- コンテンツ -->
+  <main class="min-h-screen grid place-items-center px-4 py-12">
+    <div class="w-full max-w-2xl">
+      <!-- 白カード -->
+      <div class="mx-auto bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 p-10 sm:p-12">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-center text-slate-900">サインイン</h1>
+
+        <form id="loginForm" class="mt-8 space-y-5" onsubmit="handleSubmit(event)">
+          <!-- ユーザー名 -->
+          <label class="block">
+            <span class="sr-only">ユーザー名</span>
+            <input
+              type="text" name="username" autocomplete="username" required
+              placeholder="ユーザー名"
+              class="w-full rounded-xl bg-slate-100/80 focus:bg-white px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-900 transition"
+            />
+          </label>
+          <!-- パスワード -->
+          <label class="block">
+            <span class="sr-only">パスワード</span>
+            <input
+              type="password" name="password" autocomplete="current-password" required
+              placeholder="パスワード"
+              class="w-full rounded-xl bg-slate-100/80 focus:bg-white px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-900 transition"
+            />
+          </label>
+
+        <!-- SNSボタン列（3つだけ） -->
+<div class="flex items-center justify-between gap-3 pt-1">
+    <!-- Facebook -->
+    <button type="button" aria-label="Facebookでサインイン"
+      class="flex-1 h-12 rounded-xl bg-[#1877F2] text-white flex items-center justify-center hover:opacity-90 transition">
+      <!-- Facebook SVG -->
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M22 12.06C22 6.48 17.52 2 11.94 2S2 6.48 2 12.06c0 5.02 3.68 9.19 8.49 9.94v-7.03H7.9v-2.9h2.59V9.41c0-2.56 1.53-3.98 3.86-3.98 1.12 0 2.3.2 2.3.2v2.53h-1.3c-1.28 0-1.68.79-1.68 1.6v1.92h2.86l-.46 2.9h-2.4V22c4.81-.75 8.49-4.92 8.49-9.94z"/>
+      </svg>
+    </button>
+  
+    <!-- Google -->
+    <button type="button" aria-label="Googleでサインイン"
+      class="flex-1 h-12 rounded-xl bg-white ring-1 ring-slate-200 flex items-center justify-center hover:bg-slate-50 transition">
+      <!-- Google SVG -->
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12S17.4 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.4 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c10.5 0 19.2-7.6 19.2-20 0-1.2-.1-2.1-.6-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.9 16.2 19.1 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.4 6.1 29.5 4 24 4 16 4 8.9 8.6 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.7 13.2-4.7l-6.1-5c-2 1.4-4.7 2.2-7.1 2.2-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C8.7 39.5 15.8 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.4-4.6 6-9.3 6-4.9 0-9.1-4.2-9.1-10s4.2-10 9.1-10c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.4 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c10.5 0 19.2-7.6 19.2-20 0-1.2-.1-2.1-.6-3.5z"/>
+      </svg>
+    </button>
+  
+    <!-- Apple -->
+    <button type="button" aria-label="Appleでサインイン"
+      class="flex-1 h-12 rounded-xl bg-black text-white flex items-center justify-center hover:opacity-90 transition">
+      <!-- Apple SVG -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M16.365 1.43c0 1.14-.466 2.242-1.204 3.045-.77.835-2.03 1.48-3.266 1.395-.149-1.094.436-2.241 1.167-3.006.777-.81 2.1-1.388 3.303-1.434zm4.264 16.546c-.595 1.33-.873 1.887-1.629 3.045-1.057 1.617-2.396 3.63-4.144 3.645-1.54.015-1.935-.958-4.018-.948-2.082.01-2.511.963-4.051.948-1.748-.016-3.12-1.84-4.176-3.457C.891 18.37.057 15.609.04 12.93c-.016-2.5.81-4.55 2.456-5.94 1.3-1.108 2.985-1.756 4.694-1.774 1.841-.018 3.578 1.01 4.018 1.01.44 0 2.77-1.245 4.69-1.06.798.033 3.04.322 4.48 2.415-.116.075-2.674 1.563-2.658 4.664.02 3.706 3.252 4.94 3.27 4.96-.02.058-.312 1.12-.09 1.88z"/>
+      </svg>
+    </button>
+  </div>
+
+          <!-- サインイン状態を維持 -->
+          <label class="flex items-center gap-3 select-none">
+            <input id="remember" type="checkbox" class="peer sr-only"/>
+            <span class="w-5 h-5 rounded-md ring-1 ring-slate-300 bg-white grid place-items-center
+                         peer-checked:bg-slate-900 peer-checked:text-white transition">
+              <svg class="opacity-0 peer-checked:opacity-100 transition" width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.333a1 1 0 0 1-1.433.007L3.29 9.307a1 1 0 1 1 1.42-1.408l3.004 3.027 6.54-6.61a1 1 0 0 1 1.45-.025Z"/>
+              </svg>
+            </span>
+            <span class="text-sm text-slate-700">サインイン状態を維持</span>
+          </label>
+
+          <!-- 丸い矢印ボタン -->
+          <button type="submit"
+            class="mt-2 w-24 h-24 rounded-2xl bg-white ring-1 ring-slate-200 hover:ring-slate-400 hover:shadow-lg mx-auto grid place-items-center transition">
+            <svg width="34" height="34" viewBox="0 0 24 24" class="text-slate-800" fill="currentColor" aria-hidden="true">
+              <path d="M13.172 12 7.586 6.414 9 5l8 8-8 8-1.414-1.414L13.172 12z"/>
+            </svg>
+          </button>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-slate-600">
+          サインインできませんか？ <a href="#" class="font-semibold text-slate-900 underline underline-offset-4 hover:opacity-80">アカウントを作成</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- デモ用Auth（既存フロー互換） -->
+  <script>
+    const Auth = {
+      get(){ const r = localStorage.getItem("goatusAuth"); return r?JSON.parse(r):null; },
+      login(payload){ localStorage.setItem("goatusAuth", JSON.stringify(payload)); },
+      isLoggedIn(){ return !!this.get(); }
+    };
+
+    function handleSubmit(e){
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const username = fd.get('username') || 'user';
+      const params = new URLSearchParams(location.search);
+      const returnTo = params.get("returnTo") || "gate.html";
+
+      // デモ：BRONZE / 残1/2でログイン扱い（後でAPI/SDKに差し替え）
+      Auth.login({ username, tier:"BRONZE", remaining:1, max:2, remember: document.getElementById('remember').checked });
+      location.href = returnTo;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOATUSBOX 入口</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background:#f5f6f8; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-6">
+
+  <div class="w-full max-w-2xl relative">
+
+    <!-- ヘッダー：右上アカウント（デモ表示） -->
+    <header class="flex items-start justify-end mb-4">
+      <div class="relative">
+        <button id="avatarButton"
+          class="flex items-center gap-2 rounded-full border border-slate-300 bg-white py-2 pl-2 pr-3 shadow-sm hover:bg-slate-50 transition text-left">
+          <div class="w-9 h-9 rounded-full bg-slate-800 text-white text-xs font-semibold grid place-items-center leading-none">BR</div>
+          <div class="hidden sm:flex flex-col leading-tight">
+            <span class="text-[11px] text-slate-500 font-medium">あなたのプラン</span>
+            <span class="text-[11px] text-slate-800 font-semibold">BRONZE会員</span>
+          </div>
+          <div class="text-[10px] text-slate-500 font-semibold">▼</div>
+        </button>
+
+        <!-- ドロップダウン -->
+        <div id="accountMenu"
+             class="hidden absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white shadow-[0_16px_32px_rgba(0,0,0,0.08)] text-slate-700 text-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-200 bg-slate-50">
+            <div class="text-[10px] text-slate-500 font-medium">現在のプラン</div>
+            <div class="text-[12px] text-slate-800 font-semibold flex items-center gap-2">
+              <span class="inline-block text-[10px] px-2 py-[2px] rounded-full bg-slate-800 text-white font-semibold">BRONZE</span>
+              <span>月2回質問可</span>
+            </div>
+          </div>
+          <a href="#" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium">アカウント設定</a>
+          <a href="#" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium border-t border-slate-200">管理画面</a>
+          <!-- 追加：ログアウト -->
+          <a href="#" id="logoutBtn" class="block px-4 py-3 hover:bg-slate-50 transition text-[13px] font-medium border-t border-slate-200">
+            ログアウト
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- メインカード -->
+    <div class="w-full bg-white rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.07)] border border-gray-100 p-8 text-center text-slate-800">
+      <div class="text-2xl font-bold text-slate-900 mb-4">🎉 スポンサー限定特典</div>
+      <p class="text-base text-slate-700 leading-relaxed mb-8">
+        あなたはGOATUSスポンサーとしてこの選手に直接質問できます。
+      </p>
+
+      <!-- 入口ボタン：未ログインなら login.html、ログイン済みなら form-gate.html -->
+      <a id="toFormGate" href="form-gate.html"
+         class="block w-full max-w-xl mx-auto text-white text-xl font-bold py-5 rounded-2xl bg-[#0c1222] shadow-lg hover:opacity-90 transition">
+        アスリートに質問する
+      </a>
+
+      <p class="text-base text-slate-500 leading-relaxed mt-8 mb-2">
+        あなたの質問はアスリートの投稿として公開されることがあります。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== ミニ認証ユーティリティ（デモ） ===== -->
+  <script>
+    const Auth = {
+      get(){ const r = localStorage.getItem("goatusAuth"); return r ? JSON.parse(r) : null; },
+      isLoggedIn(){ return !!this.get(); }
+    };
+    // 未ログインなら login.html に（戻り先付き）。returnTo 省略時は現在URL
+    function ensureAuth(returnTo){
+      if(!Auth.isLoggedIn()){
+        const url = 'login.html?returnTo=' + encodeURIComponent(returnTo || location.href);
+        location.href = url;
+        return false;
+      }
+      return true;
+    }
+    // ?logout=1 でデモ認証クリア（テスト用）
+    if (new URLSearchParams(location.search).get('logout') === '1') {
+      localStorage.removeItem('goatusAuth');
+      location.href = location.pathname; // クエリを消して再表示
+    }
+  </script>
+
+  <!-- ふるまい -->
+  <script>
+    // アカウントメニュー開閉
+    document.getElementById("avatarButton").addEventListener("click", ()=>{
+      document.getElementById("accountMenu").classList.toggle("hidden");
+    });
+
+    // 質問導線：クリック時にログインチェック
+    document.getElementById("toFormGate").addEventListener("click",(e)=>{
+      if(!ensureAuth("form-gate.html")) e.preventDefault();
+    });
+
+    // ログアウト
+    document.getElementById('logoutBtn')?.addEventListener('click',(e)=>{
+      e.preventDefault();
+      localStorage.removeItem('goatusAuth');
+      location.href = 'login.html?returnTo=gate.html';
+    });
+  </script>
+</body>
+</html>
