@@ -35,41 +35,11 @@
     <div class="w-full bg-white rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.07)] border border-gray-100 p-8 text-slate-800">
       <div class="text-2xl font-bold text-slate-900 mb-2 text-center">📥 受信箱</div>
       <p class="text-base text-slate-600 text-center mb-6">
-               <strong>スポンサーから届いた質問の一覧です</strong>
+        <strong>スポンサーから届いた質問の一覧です</strong>
+      </p>
 
-      <!-- 質問リスト（カード群） -->
-      <div class="space-y-4">
-
-        <!-- 質問カード（質問者側と同系の白カード/角丸/薄影/境界線） -->
-        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs text-slate-500 mb-1">ナス・2025/11/07 10:12</div>
-          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
-            最近の練習で一番意識していることは？
-          </h3>
-        </article>
-
-        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs text-slate-500 mb-1">ニンジン・2025/11/06 21:45</div>
-          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
-            試合前のルーティンを教えてください。
-          </h3>
-        </article>
-
-        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs text-slate-500 mb-1">タマネギ・2025/11/05 19:08</div>
-          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
-            今季の個人目標は？
-          </h3>
-        </article>
-
-        <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs text-slate-500 mb-1">匿名18（Bronzeスポンサー）・2025/11/05 08:31</div>
-          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
-            コンディション維持で気をつけている食事はありますか？
-          </h3>
-        </article>
-
-      </div>
+      <!-- 質問リスト（カード群：JSで動的生成） -->
+      <div id="questionList" class="space-y-4"></div>
 
       <!-- 注記 -->
       <div class="text-sm text-slate-500 mt-6 text-center">
@@ -80,9 +50,68 @@
 
   <script>
     // 右上メニュー開閉
-    document.getElementById('avatarBtn').addEventListener('click',()=>{
+    document.getElementById('avatarBtn').addEventListener('click', () => {
       document.getElementById('menu').classList.toggle('hidden');
     });
+
+    // 日付フォーマット：2025/11/07 10:12
+    function formatDate(isoString) {
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return ''; // 変な値が来たときの保険
+      const y  = d.getFullYear();
+      const m  = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      return `${y}/${m}/${dd} ${hh}:${mm}`;
+    }
+
+    // 簡易エスケープ（XSS防止用）
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[c] || c));
+    }
+
+    function renderQuestions() {
+      const listEl = document.getElementById('questionList');
+      const raw = localStorage.getItem('goatusQuestions');
+      const questions = raw ? JSON.parse(raw) : [];
+
+      if (!questions.length) {
+        listEl.innerHTML =
+          '<p class="text-sm text-slate-500 text-center">まだ質問は届いていません。</p>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+
+      questions.forEach(q => {
+        const article = document.createElement('article');
+        article.className = 'rounded-xl border border-slate-200 bg-white p-4 shadow-sm';
+
+        const name = q.nickname || 'スポンサー';
+        const time = q.createdAt ? formatDate(q.createdAt) : '';
+
+        article.innerHTML = `
+          <div class="text-xs text-slate-500 mb-1">
+            ${escapeHtml(name)}${time ? '・' + escapeHtml(time) : ''}
+          </div>
+          <h3 class="text-[15px] leading-relaxed font-semibold text-slate-900">
+            ${escapeHtml(q.text || '')}
+          </h3>
+        `;
+
+        listEl.appendChild(article);
+      });
+    }
+
+    // ページ読み込み時に描画
+    document.addEventListener('DOMContentLoaded', renderQuestions);
   </script>
 </body>
 </html>
